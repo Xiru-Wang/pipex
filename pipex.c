@@ -1,95 +1,200 @@
-#include <unistd.h>//fork pipe access
-#include <fcntl.h>//open  int open(const char *path, int oflag, ...);
-#include <stdio.h>//perror
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipex.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: xiruwang <xiruwang@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/21 17:02:54 by xiruwang          #+#    #+#             */
+/*   Updated: 2023/08/22 12:54:44 by xiruwang         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "pipex.h"
+#define BUFFER_SIZE 4096
+//./a.out color.txt cat rev file2.txt
+
 //https://github.com/jdecorte-be/42-Pipex/tree/master
 //https://codeberg.org/ilshat/Pipex/src/branch/main/My_pipex/pipex.c
-//pipe() takes an array of two int such as int end[2], and links them together.
-//end[1] will write to the its own fd, and end[0]
-//will read end[1]’s fd and write to its own
 
-// void	pipex(int f1, int f2, char *cmd1, char *cmd2)
-// {
-// 	int		fd[2];
-// 	pid_t	pid;
+static	void	child(char **av, int *fd, char **env);
+static	void	parent(char **av, int *fd, char **env);
+static	int		call_cmd(char *av, char **env);
+static	char	*get_path(char *cmd, char **env);
 
-// 	pipe(fd);
-// 	pid = fork();
-// 	if (pid < 0)
-// 	{
-// 		perror("fork failed");
-// 		return (1);
-// 	}
-// 	if (pid == 0)
-// 		child(f1, cmd1);
-// 	else
-// 		parent(f2, cmd2);
-// }
-
-//int dup2(int fd1, int fd2) [swap]
-//it will close fd2 and duplicate the value of fd2 to fd1
-
-int	main(int ac, char **av, char **envp)
+int	main(int ac, char **av, char **env)
 {
-	pid_t	pid;//process id
+	pid_t	pid;
 	int		fd[2];
+	int		status;
 
-	if (ac == 5)
+	if (ac != 5)
 	{
-		if (pipe(fd) == -1)
-		{
-			perror("Pipe error");
-			exit(1);//exit or return?
-		}
-		pid = fork(); // pid_t fork(void);
-		if (pid < 0)// == -1
-		{
-			perror("Fork failed");//void perror(const char *s);"string: errno"
-			exit (1);
-		}
-		if (pid == 0)//child
-			child(av, envp, fd);
-		parent(av, envp, fd);
-		close(fd[1]);
-		close(fd[0]);
+		write(2, "./pipex file1 cmd1 cmd2 file2\n", 31);
+		return (1);
 	}
-	return (0);
+	if (pipe(fd) == -1)
+	{
+		perror("Pipe");
+		return (1);
+	}
+	pid = fork();
+	if (pid == -1)
+	{
+		perror("Fork");
+		return (1);
+	}
+	if (pid == 0)
+		child(av, fd, env);
+	waitpid(pid, &status, 0);
+	parent(av, fd, env);
+	close(fd[1]);
+	close(fd[0]);
+	return(0);
 }
 
-//int access(char *pathname. int mode)
-//F_OK existence R_OK W_OK X_OK read, write, execute
-void	child(char **av, char **envp, int *fd)
+/*
+dup2(): swap stdin(keyboard) to file1 / swap stdout(screen) to file2
+*/
+static void	child(char **av, int *fd, char **env)
 {
-	if (access(av[1], F_OK) != 0)// if file does not exist
+	int	file1;
+
+	file1 = open(av[1], O_RDONLY);
+	if (file1 == -1)
 	{
-		write(2, "No such file or directory\n", 32);
+		perror("Failed to open the file");
 		exit(1);
 	}
-	if (access(av[1], R_OK) != 0)
-	{
-		write(2, "Permission denied\n", 32);
-		exit(1);
-	}
-	dup2(fd[1], 1); //swap stdout to fd[1] why not stdin first??
-	dup2(open(av[1], O_RDONLY), 0);//swap stdin to infile
-	close(fd[0]);//wait for parent to read
-	call_cmd(av[2], envp);
+	dup2(file1, STDIN_FILENO);
+	close(file1);
+	dup2(fd[1], STDOUT_FILENO);
+	close(fd[1]);
+	close(fd[0]);
+	call_cmd(av[2], env);
 }
+
 /*always close the end of the pipe you don't use,
 as long as the pipe is open, the other end will
 be waiting for input and will not be able to finish its process*/
 
-void	parent(char **av, char **envp, int *fd)
+/*
+-rw-r--r--/0644 (default permission), cmd line "ls -l" to check
+*/
+static void	parent(char **av, int *fd, char **env)
 {
-	int	fd;
+	int	file2;
+	char buffer[BUFFER_SIZE];
+	ssize_t bytes_read;
 
-	fd = open(av[4], O_WRONLY....); // if file doesnt exist or renew
-	if (fd == -1)
+	file2 = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (file2 == -1)
 	{
-		perror("Open failed");
+		perror("Failed to open the file2");
+		exit(EXIT_FAILURE);
+	}
+	dup2(fd[0], STDIN_FILENO);
+	dup2(file2, STDOUT_FILENO);
+	close(fd[1]);
+	if (call_cmd(av[3], env) == 1)
+	{
+		while ((bytes_read = read(fd[0], buffer, BUFFER_SIZE)) > 0)
+			write(file2, buffer, bytes_read);
+	}
+	close(fd[0]);
+	close(file2);
+	exit(0);
+}
+
+/*
+cmd[0]:cmd name, cmd[1]: cmd argument eg. char *cmd[] = {"ls", "-l", NULL}
+*/
+static int	call_cmd(char *av, char **env)
+{
+	char	**cmd;
+	char	*path;
+	int		i;
+
+	if (ft_strnstr(av, "awk ", 4) != NULL)
+	{
+		cmd = (char **)malloc(3 * sizeof(char *));
+		cmd[0] = ft_strdup("awk");
+		int len = ft_strlen(av);
+		if (av[5] && (av[5] == '{') && av[4] == av[len - 1])
+		{
+			i = 5;
+			int k = 0;
+			cmd[1] = (char *)malloc(sizeof(char) * (len - 4));
+			while (av[i] && av[i] != '\'' && av[i] != '\"')
+				cmd[1][k++] = av[i++];
+			cmd[1][k] = 0;
+			cmd[2] = NULL;
+		}
+		else if (av[5] == '\'')
+		{
+			ft_free(cmd);
+			perror("awk: syntax error");
+			exit(2);
+		}
+		else if (av[5] == '\"')
+		{
+			ft_free(cmd);
+			return(1);
+		}
+	}
+	else
+		cmd = ft_split(av, ' ');
+	path = get_path(cmd[0], env);
+	if (!path)
+	{
+		ft_free(cmd);
+		perror("Path not found");
 		exit(1);
 	}
-	dup2(fd[0], 0);
-	dup2(fd, 1);
-	close(fd[1]);// child write
-	call_cmd(av[3], envp);
+	if (execve(path, cmd, env) == -1)
+	{
+		perror("Command not found");
+		ft_free(cmd);
+		free(path);
+		exit(1);//retun 1
+	}
+	return (0);
+}
+
+/*
+1. loop thru all enviroment vars
+2. find path= eg. PATH=/bin:/usr/bin:/usr/local/bin
+3. skip "path="
+4. Got all paths:(PATH=)/bin:/usr/bin:/usr/local/bin
+5. strjoin "/" + "cmd name"
+6. access, try one by one
+*/
+
+static char	*get_path(char *cmd, char **env)
+{
+	char	**paths;
+	char	*path_dir;
+	char	*path_cmd;
+	int		i;
+
+	i = 0;
+	while (ft_strnstr(env[i], "PATH=", 5) == 0)
+		i++;
+	paths = ft_split(env[i] + 5, ':');
+	i = 0;
+	while (paths[i])
+	{
+		path_dir = ft_strjoin(paths[i], "/");
+		path_cmd = ft_strjoin(path_dir, cmd);
+		free(path_dir);
+		if (access(path_cmd, F_OK | X_OK) == 0)
+		{
+			ft_free(paths);
+			return (path_cmd);
+		}
+		free(path_cmd);
+		i++;
+	}
+	ft_free (paths);
+	return (NULL);
 }
