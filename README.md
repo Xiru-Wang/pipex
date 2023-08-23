@@ -34,3 +34,11 @@ Here's a simplified breakdown of how this works:
 
 ![3](https://github.com/Xiru-Wang/pipex/assets/79924696/8925b1fa-ebaf-451f-bbdb-dc33d17edf3c)
 
+# Environment Variables
+![3](https://github.com/Xiru-Wang/pipex/assets/79924696/0e02d81b-9865-45c2-9a36-31c47c48aa0d)
+
+# Fork
+![4](https://github.com/Xiru-Wang/pipex/assets/79924696/48673432-7052-4314-b9df-b1c5033f6538)
+
+# Dup2
+![5](https://github.com/Xiru-Wang/pipex/assets/79924696/89b7edda-dfa4-45ea-b058-4e01be65cba7)
