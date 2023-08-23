@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xiruwang <xiruwang@student.42.fr>          +#+  +:+       +#+        */
+/*   By: xiwang <xiwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 17:02:54 by xiruwang          #+#    #+#             */
-/*   Updated: 2023/08/22 12:54:44 by xiruwang         ###   ########.fr       */
+/*   Updated: 2023/08/23 20:33:41 by xiwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 
 static	void	child(char **av, int *fd, char **env);
 static	void	parent(char **av, int *fd, char **env);
-static	int		call_cmd(char *av, char **env);
+static	void	call_cmd(char *av, char **env);
 static	char	*get_path(char *cmd, char **env);
 
 int	main(int ac, char **av, char **env)
@@ -84,8 +84,8 @@ be waiting for input and will not be able to finish its process*/
 static void	parent(char **av, int *fd, char **env)
 {
 	int	file2;
-	char buffer[BUFFER_SIZE];
-	ssize_t bytes_read;
+	//char buffer[BUFFER_SIZE];
+	//ssize_t bytes_read;
 
 	file2 = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (file2 == -1)
@@ -96,25 +96,54 @@ static void	parent(char **av, int *fd, char **env)
 	dup2(fd[0], STDIN_FILENO);
 	dup2(file2, STDOUT_FILENO);
 	close(fd[1]);
+	call_cmd(av[3], env);
+	// close(fd[0]);
+	// close(file2);
+	// exit(0);
+}
+
+/*
 	if (call_cmd(av[3], env) == 1)
 	{
 		while ((bytes_read = read(fd[0], buffer, BUFFER_SIZE)) > 0)
 			write(file2, buffer, bytes_read);
 	}
-	close(fd[0]);
-	close(file2);
-	exit(0);
-}
+*/
 
 /*
 cmd[0]:cmd name, cmd[1]: cmd argument eg. char *cmd[] = {"ls", "-l", NULL}
 */
-static int	call_cmd(char *av, char **env)
+static void	call_cmd(char *av, char **env)
 {
 	char	**cmd;
 	char	*path;
-	int		i;
 
+	cmd = ft_split(av, ' ');
+	path = get_path(cmd[0], env);
+	printf("%s\n", path);
+	printf("%s\n", cmd[0]);
+	if (cmd && path)
+	{
+		if (execve(path, cmd, env) == -1)
+		{
+			perror("Command not found");
+			ft_free(cmd);
+			free(path);
+			exit(1);
+		}
+	}
+	else
+	{
+		free(path);
+		ft_free(cmd);
+		perror("Error");
+		exit(1);
+	}
+	exit(0);
+}
+
+
+/*
 	if (ft_strnstr(av, "awk ", 4) != NULL)
 	{
 		cmd = (char **)malloc(3 * sizeof(char *));
@@ -142,25 +171,7 @@ static int	call_cmd(char *av, char **env)
 			return(1);
 		}
 	}
-	else
-		cmd = ft_split(av, ' ');
-	path = get_path(cmd[0], env);
-	if (!path)
-	{
-		ft_free(cmd);
-		perror("Path not found");
-		exit(1);
-	}
-	if (execve(path, cmd, env) == -1)
-	{
-		perror("Command not found");
-		ft_free(cmd);
-		free(path);
-		exit(1);//retun 1
-	}
-	return (0);
-}
-
+*/
 /*
 1. loop thru all enviroment vars
 2. find path= eg. PATH=/bin:/usr/bin:/usr/local/bin
@@ -178,7 +189,7 @@ static char	*get_path(char *cmd, char **env)
 	int		i;
 
 	i = 0;
-	while (ft_strnstr(env[i], "PATH=", 5) == 0)
+	while (ft_strnstr(env[i], "PATH=", 5) == NULL)
 		i++;
 	paths = ft_split(env[i] + 5, ':');
 	i = 0;
