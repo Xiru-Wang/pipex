@@ -6,11 +6,17 @@
 /*   By: xiruwang <xiruwang@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 17:03:06 by xiruwang          #+#    #+#             */
-/*   Updated: 2023/08/21 19:51:23 by xiruwang         ###   ########.fr       */
+/*   Updated: 2023/08/23 22:38:38 by xiruwang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+void	handle_err(char *str)
+{
+	perror(str);
+	exit(EXIT_FAILURE);
+}
 
 void	ft_free(char **arr)
 {
@@ -25,18 +31,18 @@ void	ft_free(char **arr)
 	free(arr);
 }
 
-char	*ft_strdup(const char *s)
-{
-	char	*ret;
-	size_t	len;
+// char	*ft_strdup(const char *s)
+// {
+// 	char	*ret;
+// 	size_t	len;
 
-	len = ft_strlen(s) + 1;
-	ret = (char *)malloc(len * sizeof(char));
-	if (ret == NULL)
-		return (NULL);
-	ft_strlcpy(ret, s, len);
-	return (ret);
-}
+// 	len = ft_strlen(s) + 1;
+// 	ret = (char *)malloc(len * sizeof(char));
+// 	if (ret == NULL)
+// 		return (NULL);
+// 	ft_strlcpy(ret, s, len);
+// 	return (ret);
+// }
 
 size_t	ft_strlen(const char *s)
 {

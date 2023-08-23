@@ -6,13 +6,13 @@
 /*   By: xiruwang <xiruwang@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 17:02:45 by xiruwang          #+#    #+#             */
-/*   Updated: 2023/08/21 20:14:12 by xiruwang         ###   ########.fr       */
+/*   Updated: 2023/08/23 22:04:23 by xiruwang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-size_t	ft_strlcpy(char *restrict dst, const char *restrict src, size_t dstsize)
+/*size_t	ft_strlcpy(char *restrict dst, const char *restrict src, size_t dstsize)
 {
 	size_t	i;
 
@@ -22,12 +22,12 @@ size_t	ft_strlcpy(char *restrict dst, const char *restrict src, size_t dstsize)
 		dst[i] = src[i];
 		i++;
 	}
-	if (i < dstsize) // NUL-terminating the result if dstsize is not 0
+	if (i < dstsize)
 		dst[i] = 0;
-	while (src[i]) // 避免遗漏未复制的字符
+	while (src[i])
 		i++;
 	return (i);
-}
+}*/
 
 static char	**ft_free_err(char **arr)
 {

@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xiwang <xiwang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: xiruwang <xiruwang@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 17:02:54 by xiruwang          #+#    #+#             */
-/*   Updated: 2023/08/23 20:33:41 by xiwang           ###   ########.fr       */
+/*   Updated: 2023/08/23 22:47:22 by xiruwang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-#define BUFFER_SIZE 4096
+//#define BUFFER_SIZE 4096
 //./a.out color.txt cat rev file2.txt
 
 //https://github.com/jdecorte-be/42-Pipex/tree/master
@@ -34,16 +34,10 @@ int	main(int ac, char **av, char **env)
 		return (1);
 	}
 	if (pipe(fd) == -1)
-	{
-		perror("Pipe");
-		return (1);
-	}
+		handle_err("pipe");
 	pid = fork();
 	if (pid == -1)
-	{
-		perror("Fork");
-		return (1);
-	}
+		handle_err("fork");
 	if (pid == 0)
 		child(av, fd, env);
 	waitpid(pid, &status, 0);
@@ -62,10 +56,7 @@ static void	child(char **av, int *fd, char **env)
 
 	file1 = open(av[1], O_RDONLY);
 	if (file1 == -1)
-	{
-		perror("Failed to open the file");
-		exit(1);
-	}
+		handle_err("Failed to open file1");
 	dup2(file1, STDIN_FILENO);
 	close(file1);
 	dup2(fd[1], STDOUT_FILENO);
@@ -81,38 +72,26 @@ be waiting for input and will not be able to finish its process*/
 /*
 -rw-r--r--/0644 (default permission), cmd line "ls -l" to check
 */
+
 static void	parent(char **av, int *fd, char **env)
 {
 	int	file2;
-	//char buffer[BUFFER_SIZE];
-	//ssize_t bytes_read;
 
 	file2 = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (file2 == -1)
-	{
-		perror("Failed to open the file2");
-		exit(EXIT_FAILURE);
-	}
+		handle_err("Failed to open file2");
 	dup2(fd[0], STDIN_FILENO);
+	close(fd[0]);
 	dup2(file2, STDOUT_FILENO);
+	close(file2);
 	close(fd[1]);
 	call_cmd(av[3], env);
-	// close(fd[0]);
-	// close(file2);
-	// exit(0);
 }
-
-/*
-	if (call_cmd(av[3], env) == 1)
-	{
-		while ((bytes_read = read(fd[0], buffer, BUFFER_SIZE)) > 0)
-			write(file2, buffer, bytes_read);
-	}
-*/
 
 /*
 cmd[0]:cmd name, cmd[1]: cmd argument eg. char *cmd[] = {"ls", "-l", NULL}
 */
+
 static void	call_cmd(char *av, char **env)
 {
 	char	**cmd;
@@ -120,26 +99,15 @@ static void	call_cmd(char *av, char **env)
 
 	cmd = ft_split(av, ' ');
 	path = get_path(cmd[0], env);
-	printf("%s\n", path);
-	printf("%s\n", cmd[0]);
-	if (cmd && path)
+	if (!path)
 	{
-		if (execve(path, cmd, env) == -1)
-		{
-			perror("Command not found");
-			ft_free(cmd);
-			free(path);
-			exit(1);
-		}
-	}
-	else
-	{
-		free(path);
 		ft_free(cmd);
-		perror("Error");
-		exit(1);
+		write(STDERR_FILENO, cmd[0], ft_strlen(cmd[0]));
+		handle_err(": command not found");
+		//perror(": command not found");
+		//exit(1);
 	}
-	exit(0);
+	execve(path, cmd, env);
 }
 
 
