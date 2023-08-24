@@ -6,7 +6,7 @@
 /*   By: xiruwang <xiruwang@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 17:02:54 by xiruwang          #+#    #+#             */
-/*   Updated: 2023/08/23 22:47:22 by xiruwang         ###   ########.fr       */
+/*   Updated: 2023/08/24 15:00:13 by xiruwang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,9 +107,13 @@ static void	call_cmd(char *av, char **env)
 		//perror(": command not found");
 		//exit(1);
 	}
-	execve(path, cmd, env);
+	if (execve(path, cmd, env) == -1)
+	{
+		free(path);
+		ft_free(cmd);
+		handle_err("execve");
+	}
 }
-
 
 /*
 	if (ft_strnstr(av, "awk ", 4) != NULL)
