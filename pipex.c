@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xiruwang <xiruwang@student.42.fr>          +#+  +:+       +#+        */
+/*   By: xiwang <xiwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 17:02:54 by xiruwang          #+#    #+#             */
-/*   Updated: 2023/08/24 15:00:13 by xiruwang         ###   ########.fr       */
+/*   Updated: 2023/08/24 17:54:20 by xiwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 
 //https://github.com/jdecorte-be/42-Pipex/tree/master
 //https://codeberg.org/ilshat/Pipex/src/branch/main/My_pipex/pipex.c
+//https://github.com/mariadaan/PIPEXaminator
 
 static	void	child(char **av, int *fd, char **env);
 static	void	parent(char **av, int *fd, char **env);
@@ -31,7 +32,7 @@ int	main(int ac, char **av, char **env)
 	if (ac != 5)
 	{
 		write(2, "./pipex file1 cmd1 cmd2 file2\n", 31);
-		return (1);
+		exit (1);
 	}
 	if (pipe(fd) == -1)
 		handle_err("pipe");
@@ -44,7 +45,7 @@ int	main(int ac, char **av, char **env)
 	parent(av, fd, env);
 	close(fd[1]);
 	close(fd[0]);
-	return(0);
+	return (0);
 }
 
 /*
@@ -103,9 +104,8 @@ static void	call_cmd(char *av, char **env)
 	{
 		ft_free(cmd);
 		write(STDERR_FILENO, cmd[0], ft_strlen(cmd[0]));
-		handle_err(": command not found");
-		//perror(": command not found");
-		//exit(1);
+		write(STDERR_FILENO, " :command not found\n", 20);
+		exit(127);
 	}
 	if (execve(path, cmd, env) == -1)
 	{
@@ -161,9 +161,11 @@ static char	*get_path(char *cmd, char **env)
 	int		i;
 
 	i = 0;
-	while (ft_strnstr(env[i], "PATH=", 5) == NULL)
+	while (ft_strnstr(env[i], "PATH", 4) == NULL)
 		i++;
 	paths = ft_split(env[i] + 5, ':');
+	if (!paths)
+		handle_err("No path found");
 	i = 0;
 	while (paths[i])
 	{

@@ -3,31 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xiruwang <xiruwang@student.42.fr>          +#+  +:+       +#+        */
+/*   By: xiwang <xiwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/21 17:02:45 by xiruwang          #+#    #+#             */
-/*   Updated: 2023/08/23 22:04:23 by xiruwang         ###   ########.fr       */
+/*   Created: 2023/08/24 17:53:22 by xiwang            #+#    #+#             */
+/*   Updated: 2023/08/24 17:53:26 by xiwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-/*size_t	ft_strlcpy(char *restrict dst, const char *restrict src, size_t dstsize)
-{
-	size_t	i;
-
-	i = 0;
-	while (i + 1 < dstsize && src[i])
-	{
-		dst[i] = src[i];
-		i++;
-	}
-	if (i < dstsize)
-		dst[i] = 0;
-	while (src[i])
-		i++;
-	return (i);
-}*/
 
 static char	**ft_free_err(char **arr)
 {

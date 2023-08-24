@@ -20,7 +20,7 @@
 # include <stdlib.h>// malloc
 # include <sys/wait.h>// waitpid
 
-void	handle_err(char *str)
+void	handle_err(char *str);
 size_t	ft_strlen(const char *s);
 char	*ft_strjoin(char const *s1, char const *s2);
 char	*ft_strnstr(const char *s1, const char *s2, size_t len);
