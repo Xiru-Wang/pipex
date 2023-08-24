@@ -6,7 +6,7 @@
 /*   By: xiwang <xiwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 17:02:54 by xiruwang          #+#    #+#             */
-/*   Updated: 2023/08/24 17:54:20 by xiwang           ###   ########.fr       */
+/*   Updated: 2023/08/24 19:13:51 by xiwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,9 +102,9 @@ static void	call_cmd(char *av, char **env)
 	path = get_path(cmd[0], env);
 	if (!path)
 	{
-		ft_free(cmd);
+		write(STDERR_FILENO, "command not found: ", 19);
 		write(STDERR_FILENO, cmd[0], ft_strlen(cmd[0]));
-		write(STDERR_FILENO, " :command not found\n", 20);
+		ft_free(cmd);
 		exit(127);
 	}
 	if (execve(path, cmd, env) == -1)

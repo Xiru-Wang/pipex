@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xiruwang <xiruwang@student.42.fr>          +#+  +:+       +#+        */
+/*   By: xiwang <xiwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 17:03:06 by xiruwang          #+#    #+#             */
-/*   Updated: 2023/08/23 22:38:38 by xiruwang         ###   ########.fr       */
+/*   Updated: 2023/08/24 18:54:52 by xiwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,21 +56,27 @@ size_t	ft_strlen(const char *s)
 
 char	*ft_strnstr(const char *s1, const char *s2, size_t len)
 {
-	int	i;
-	int	k;
+	size_t			i;
+	size_t			k;
+	unsigned char	*ret;
 
 	i = 0;
-	k = 0;
 	if (*s2 == 0)
 		return ((char *)s1);
-	while (*s2 && *s1 && len > 0)
+	ret = (unsigned char *)s1;
+	while (ret[i] && i < len)
 	{
-		while (s1[i + k] == s2[k] && len--)
-			k++;
-		if (s2[k] == '\0')
-			return ((char *)&s1[i]);
+		k = 0;
+		if (ret[i] == s2[k])
+		{
+			while (ret[i + k] == s2[k] && i + k < len)
+			{
+				k++;
+				if (s2[k] == 0)
+					return (&((char *)s1)[i]);
+			}
+		}
 		i++;
-		len--;
 	}
 	return (NULL);
 }
