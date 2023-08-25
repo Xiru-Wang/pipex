@@ -1,48 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   utils2.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xiwang <xiwang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: xiruwang <xiruwang@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 17:03:06 by xiruwang          #+#    #+#             */
-/*   Updated: 2023/08/24 18:54:52 by xiwang           ###   ########.fr       */
+/*   Updated: 2023/08/25 14:45:13 by xiruwang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-void	handle_err(char *str)
-{
-	perror(str);
-	exit(EXIT_FAILURE);
-}
-
-void	ft_free(char **arr)
-{
-	int	i;
-
-	i = 0;
-	while (arr[i])
-	{
-		free(arr[i]);
-		i++;
-	}
-	free(arr);
-}
-
-// char	*ft_strdup(const char *s)
-// {
-// 	char	*ret;
-// 	size_t	len;
-
-// 	len = ft_strlen(s) + 1;
-// 	ret = (char *)malloc(len * sizeof(char));
-// 	if (ret == NULL)
-// 		return (NULL);
-// 	ft_strlcpy(ret, s, len);
-// 	return (ret);
-// }
 
 size_t	ft_strlen(const char *s)
 {
@@ -107,4 +75,34 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	}
 	join[i] = '\0';
 	return (join);
+}
+
+char	*ft_strdup(const char *s)
+{
+	char	*ret;
+	size_t	len;
+
+	len = ft_strlen(s) + 1;
+	ret = (char *)malloc(len * sizeof(char));
+	if (ret == NULL)
+		return (NULL);
+	ft_strlcpy(ret, s, len);
+	return (ret);
+}
+
+size_t	ft_strlcpy(char *dst, const char *src, size_t size)
+{
+	size_t	i;
+
+	i = 0;
+	while (i + 1 < size && src[i])
+	{
+		dst[i] = src[i];
+		i++;
+	}
+	if (i < size)
+		dst[i] = 0;
+	while (src[i])
+		i++;
+	return (i);
 }

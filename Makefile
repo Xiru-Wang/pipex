@@ -3,7 +3,8 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror
 LIB = pipex.h
 SRC = pipex.c \
-		utils.c \
+		utils1.c \
+		utils2.c \
 		ft_split.c
 
 OBJS = $(SRC:.c=.o)

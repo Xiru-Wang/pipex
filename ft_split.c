@@ -3,14 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xiwang <xiwang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: xiruwang <xiruwang@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/24 17:53:22 by xiwang            #+#    #+#             */
-/*   Updated: 2023/08/24 17:53:26 by xiwang           ###   ########.fr       */
+/*   Updated: 2023/08/25 14:22:15 by xiruwang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+void	ft_free(char **arr)
+{
+	int	i;
+
+	i = 0;
+	while (arr[i])
+	{
+		free(arr[i]);
+		i++;
+	}
+	free(arr);
+}
 
 static char	**ft_free_err(char **arr)
 {
