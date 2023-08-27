@@ -79,7 +79,7 @@ int main()
 	char *args[] = {"ls", "-l", NULL};
 
 	call_cmd(cmd, args);
-	printf("if call_cmd sucessful, this line will not be printed out\n");
+	printf("if call_cmd sucessful, this line will not be printed\n");
 
 	return (0);
 }
