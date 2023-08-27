@@ -37,6 +37,51 @@ Here's a simplified breakdown of how this works:
 # Environment Variables
 ![3](https://github.com/Xiru-Wang/pipex/assets/79924696/0e02d81b-9865-45c2-9a36-31c47c48aa0d)
 
+#include <stdio.h>
+/*
+The env parameter is obtained from the operating system
+and contains all the environment variables that are set when you start the process.
+In fact, when you start a program from the command line, 
+it inherits the environment variables from the shell that started it.
+*/
+
+int main(int ac, char **av, char **env) {
+    for (int i = 0; env[i]; i++) {
+        printf("%s\n", env[i]);
+    }
+    return 0;
+}
+
+# execve() transforms the calling process into a new process.
+
+int execve(const char *path, char *const argv[], char *const envp[]);
+- path: the new process file (an executable object file) whose name is pointed to by path
+- argv: 2d array(null-terminated),the first element should be the name of the executed program
+
+RETURN VALUES
+The successful call has NO process to return to. If execve() does return to the calling process(return value: -1),
+an error has occurred; errno is set to indicate the error.
+
+#include <unistd.h>
+#include <stdio.h>
+
+void call_cmd(char *cmd, char **args)
+{
+	execve(cmd, args, NULL);
+	printf("This line will not be executed, except something went wrong\n");
+}
+
+int main()
+{
+	char cmd[] = "/bin/ls";
+	char *args[] = {"ls", "-l", NULL};
+
+	call_cmd(cmd, args);
+	printf("if call_cmd sucessful, this line will not be printed out\n");
+
+	return (0);
+}
+
 # Fork
 ![4](https://github.com/Xiru-Wang/pipex/assets/79924696/48673432-7052-4314-b9df-b1c5033f6538)
 
