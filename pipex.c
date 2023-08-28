@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xiruwang <xiruwang@student.42.fr>          +#+  +:+       +#+        */
+/*   By: xiwang <xiwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 17:02:54 by xiruwang          #+#    #+#             */
-/*   Updated: 2023/08/25 19:56:51 by xiruwang         ###   ########.fr       */
+/*   Updated: 2023/08/28 19:09:06 by xiwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,14 @@ int	main(int ac, char **av, char **env)
 		handle_err("fork");
 	if (pid == 0)
 		child(av, fd, env);
-	waitpid(pid, &status, WNOHANG);//waitpid(pid, &status, 0);
+	wait(&status);
 	parent(av, fd, env);
+	return (0);
 }
 
 /*
+The wait() system call in Unix-like operating systems is designed to 
+make a parent process wait until all its child processes have terminated. 
 dup2(): redirect stdin(keyboard) to file1 / swap stdout(screen) to file2
 */
 static void	child(char **av, int *fd, char **env)
@@ -60,6 +63,7 @@ static void	child(char **av, int *fd, char **env)
 	dup2(fd[1], STDOUT_FILENO);
 	close_pipe(fd);
 	call_cmd(av[2], env);
+	exit(0);
 }
 
 /*
@@ -111,18 +115,15 @@ static int	call_cmd(char *av, char **env)
 	path = get_path(cmd[0], env);
 	if (!path)
 	{
-		write(STDERR_FILENO, "pipex: ", 7);
 		write(STDERR_FILENO, cmd[0], ft_strlen(cmd[0]));
-		write(STDERR_FILENO, ": command not found\n ", 20);
+		write(STDERR_FILENO, ": pipex: command not found\n", 27);
 		ft_free(cmd);
-		exit(1);//127?
+		exit(127);
 	}
-	if (execve(path, cmd, env) == -1)
-	{
-		free(path);
-		ft_free(cmd);
-		handle_err("execve");
-	}
+	execve(path, cmd, env);
+	free(path);
+	ft_free(cmd);
+	handle_err("execve");
 	return (0);
 }
 
@@ -138,7 +139,7 @@ static int	call_cmd(char *av, char **env)
 static char	*get_path(char *cmd, char **env)
 {
 	char	**paths;
-	char	*path_dir;
+	char	*temp;
 	char	*path_cmd;
 	int		i;
 
@@ -146,21 +147,18 @@ static char	*get_path(char *cmd, char **env)
 	while (ft_strnstr(env[i], "PATH=", 5) == NULL)
 		i++;
 	paths = ft_split(env[i] + 5, ':');
-	if (paths == NULL)
-		handle_err("No path found");
-	i = 0;
-	while (paths[i])
+	i = -1;
+	while (paths[++i])
 	{
-		path_dir = ft_strjoin(paths[i], "/");
-		path_cmd = ft_strjoin(path_dir, cmd);
-		free(path_dir);
+		temp = ft_strjoin(paths[i], "/");
+		path_cmd = ft_strjoin(temp, cmd);
+		free(temp);
 		if (access(path_cmd, F_OK | X_OK) == 0)
 		{
 			ft_free(paths);
 			return (path_cmd);
 		}
 		free(path_cmd);
-		i++;
 	}
 	ft_free (paths);
 	return (NULL);

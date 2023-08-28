@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils1.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: xiwang <xiwang@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/28 16:00:20 by xiwang            #+#    #+#             */
+/*   Updated: 2023/08/28 19:00:30 by xiwang           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
 void	handle_err(char *str)
@@ -8,39 +20,30 @@ void	handle_err(char *str)
 
 char	**call_awk(char *av)
 {
-	char	**cmd;
-	int		i;
-	int		k;
-	int		len;
+	char		**cmd;
+	size_t		i;
+	size_t		k;
 
 	cmd = (char **)malloc(3 * sizeof(char *));
 	cmd[0] = ft_strdup("awk");
-	len = ft_strlen(av);
-	if (av[4] == av[len - 1])
+	if (av[4] == av[ft_strlen(av) - 1])
 	{
 		if (av[4] == '\'' && av[5] == '\"')
 		{
 			ft_free(cmd);
-			return (NULL);//print the 1st cmd
+			return (NULL);
 		}
 		i = 5;
 		k = 0;
-		cmd[1] = (char *)malloc(sizeof(char) * (len - 4));
-		while (av[i] && i < (len - 1))
-		{
-			cmd[1][k] = av[i];
-			i++;
-			k++;
-		}
+		cmd[1] = (char *)malloc(sizeof(char) * (ft_strlen(av) - 4));
+		while (av[i] && i < (ft_strlen(av) - 1))
+			cmd[1][k++] = av[i++];
 		cmd[1][k] = 0;
 		cmd[2] = NULL;
 		return (cmd);
 	}
-	else
-	{
-		perror("awk: syntax error");
-		exit(2);
-	}
+	handle_err("awk: syntax error");
+	return (NULL);
 }
 
 void	close_pipe(int *fd)
@@ -55,7 +58,5 @@ void	close_pipe(int *fd)
 //  context is
 // 	 >>> ' <<<
 // awk: bailing out at source line 1
-
-
 //< input grep Hello | awk '"{count++} END {print count}"' > output
 //print 1st cmd
