@@ -57,11 +57,15 @@ int main(int ac, char **av, char **env)
 # execve() transforms the calling process into a new process.
 
 int execve(const char *path, char *const argv[], char *const envp[]);
+
 - path: the new process file (an executable object file) whose name is pointed to by path
-- argv: 2d array(null-terminated),the first element should be the name of the executed program
+  
+- argv: 2d array(null-terminated), the first element should be the name of the executed program
 
 RETURN VALUES
+
 The successful call has NO process to return to. 
+
 If execve() does return to the calling process(return value: -1),
 an error has occurred; errno is set to indicate the error.
 ```
@@ -86,7 +90,9 @@ int main()
 }
 ```
 # Fork
-![4](https://github.com/Xiru-Wang/pipex/assets/79924696/48673432-7052-4314-b9df-b1c5033f6538)
+![5](https://github.com/Xiru-Wang/pipex/assets/79924696/79e63699-7671-49c3-8dbe-ff315708a837)
+
 
 # Dup2
-![5](https://github.com/Xiru-Wang/pipex/assets/79924696/89b7edda-dfa4-45ea-b058-4e01be65cba7)
+![6](https://github.com/Xiru-Wang/pipex/assets/79924696/d9e674c0-3f1c-41ba-8b0a-d14805d7209a)
+
