@@ -32,7 +32,7 @@ Here's a simplified breakdown of how this works:
 
 4. **Process Independence**: File descriptors are independent between processes. So, if the child process closes its `fd[0]`, it doesn't affect the parent's `fd[0]`. However, because both descriptors are "gateways" to the same kernel buffer, data written via one descriptor can be read via the other.
 
-![pipe_execution](https://github.com/Xiru-Wang/pipex/assets/79924696/8925b1fa-ebaf-451f-bbdb-dc33d17edf3c)
+![child process and parent process](https://github.com/Xiru-Wang/pipex/assets/79924696/8925b1fa-ebaf-451f-bbdb-dc33d17edf3c)
 
 # Environment Variables
 ![Environment Variables](https://github.com/Xiru-Wang/pipex/assets/79924696/0e02d81b-9865-45c2-9a36-31c47c48aa0d)
