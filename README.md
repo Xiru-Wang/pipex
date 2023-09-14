@@ -13,7 +13,7 @@ cmd1 and cmd2 are shell commands with their parameters.
 
 # Understand the data flow:
 
-![2](https://github.com/Xiru-Wang/pipex/assets/79924696/3d253c1f-835c-4f63-af84-af0bc96ac338)
+![pipex_pipe_datacflow](https://github.com/Xiru-Wang/pipex/assets/79924696/3d253c1f-835c-4f63-af84-af0bc96ac338)
 
 
 # How do pipes facilitate data transfer between processes?
@@ -32,10 +32,10 @@ Here's a simplified breakdown of how this works:
 
 4. **Process Independence**: File descriptors are independent between processes. So, if the child process closes its `fd[0]`, it doesn't affect the parent's `fd[0]`. However, because both descriptors are "gateways" to the same kernel buffer, data written via one descriptor can be read via the other.
 
-![3](https://github.com/Xiru-Wang/pipex/assets/79924696/8925b1fa-ebaf-451f-bbdb-dc33d17edf3c)
+![pipe_execution](https://github.com/Xiru-Wang/pipex/assets/79924696/8925b1fa-ebaf-451f-bbdb-dc33d17edf3c)
 
 # Environment Variables
-![3](https://github.com/Xiru-Wang/pipex/assets/79924696/0e02d81b-9865-45c2-9a36-31c47c48aa0d)
+![Environment Variables](https://github.com/Xiru-Wang/pipex/assets/79924696/0e02d81b-9865-45c2-9a36-31c47c48aa0d)
 
 ```
 #include <stdio.h>
@@ -90,9 +90,9 @@ int main()
 }
 ```
 # Fork
-![5](https://github.com/Xiru-Wang/pipex/assets/79924696/79e63699-7671-49c3-8dbe-ff315708a837)
+![fork](https://github.com/Xiru-Wang/pipex/assets/79924696/79e63699-7671-49c3-8dbe-ff315708a837)
 
 
 # Dup2
-![6](https://github.com/Xiru-Wang/pipex/assets/79924696/d9e674c0-3f1c-41ba-8b0a-d14805d7209a)
+![dup2](https://github.com/Xiru-Wang/pipex/assets/79924696/d9e674c0-3f1c-41ba-8b0a-d14805d7209a)
 
